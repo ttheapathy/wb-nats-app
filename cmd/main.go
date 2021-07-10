@@ -65,8 +65,7 @@ func worker(nc *nats.EncodedConn, db *sqlx.DB, name string) {
 
 	if _, err := nc.QueueSubscribe("insert", "workers", func(messages []Messages) {
 		log.Printf("Started job in: [%s]\n", name)
-		_, err := db.NamedExec(`insert into messages (text)
-        VALUES (:text)`, messages)
+		_, err := db.NamedExec(`insert into messages (text) VALUES (:text)`, messages)
 		if err != nil {
 			log.Fatal(err)
 		}
