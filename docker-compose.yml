@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  wb-app:
+    build: ./
+    command: ./wb-app
+    ports:
+      - 3000:3000
+    depends_on:
+        wb-db:
+            condition: service_healthy
+    environment:
+      - DB_PASSWORD=${DB_PASSWORD}
+    env_file:
+      - .env
+  wb-db:
+    image: postgres:latest
+    volumes:
+    - ./.database/postgres/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  wb-nats:
+    image: nats
