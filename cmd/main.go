@@ -17,6 +17,10 @@ type Messages struct {
 	Text string `db:"text"`
 }
 
+type ErrorMessage struct {
+	Message string
+}
+
 func main() {
 
 	app := fiber.New()
@@ -51,7 +55,9 @@ func main() {
 
 		messages := []Messages{}
 
-		db.Select(&messages, "select * from messages order by id desc fetch first 100 rows only")
+		if err := db.Select(&messages, "select * from messages order by id desc fetch first 100 rows only"); err != nil {
+			return c.JSON(ErrorMessage{Message: err.Error()})
+		}
 
 		return c.JSON(messages)
 	})
